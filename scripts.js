@@ -9,6 +9,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const ctx = document.getElementById('chart').getContext('2d');
     const tempCtx = document.getElementById('tempGauge').getContext('2d');
     const humCtx = document.getElementById('humGauge').getContext('2d');
+    const soilMoistureElements = [
+        document.getElementById('moisture1'),
+        document.getElementById('moisture2'),
+        document.getElementById('moisture3'),
+        document.getElementById('moisture4')
+    ];
 
     let chart;
     let tempGauge;
@@ -58,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 updateGauge(tempGauge, data.temperature);
                 updateGauge(humGauge, data.humidity);
                 updateLEDs(data.pumpStatus);
+                updateMoisture(data.soilMoisture);
                 updateChart(data.history);
             })
             .catch(error => console.error('Error fetching data:', error));
@@ -78,6 +85,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 ledElements[index].classList.remove('green');
                 ledElements[index].classList.add('gray');
             }
+        });
+    }
+
+    function updateMoisture(moistureData) {
+        moistureData.forEach((moisture, index) => {
+            soilMoistureElements[index].textContent = `Bodenfeuchte: ${moisture}%`;
         });
     }
 
