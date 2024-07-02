@@ -25,7 +25,7 @@ body {
 
 .gauges {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between; /* Änderung von space-around zu space-between */
 }
 
 .chart-container {
