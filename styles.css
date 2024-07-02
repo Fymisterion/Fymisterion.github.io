@@ -49,3 +49,7 @@ body {
 .led.gray {
     background-color: gray;
 }
+
+.moisture {
+    margin-bottom: 5px;
+}
