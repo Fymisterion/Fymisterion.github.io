@@ -31,8 +31,8 @@ body {
 }
 
 .gauges canvas {
-    width: 100px; /* Breite anpassen, je nach gewünschtem Layout */
-    height: 100px; /* Höhe anpassen, je nach gewünschtem Layout */
+    width: 200px; /* Breite anpassen, je nach gewünschtem Layout */
+    height: 200px; /* Höhe anpassen, je nach gewünschtem Layout */
 }
 
 .chart-container {
