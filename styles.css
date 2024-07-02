@@ -25,14 +25,12 @@ body {
 
 .gauges {
     display: flex;
-    flex-direction: row; /* Zeile anstatt space-around */
-    justify-content: space-between;
-    align-items: center; /* Zentriert vertikal */
+    justify-content: space-around;
 }
 
 .gauges canvas {
-    width: 200px; /* Breite anpassen, je nach gewünschtem Layout */
-    height: 200px; /* Höhe anpassen, je nach gewünschtem Layout */
+    width: 150px;
+    height: 150px;
 }
 
 .chart-container {
@@ -57,6 +55,12 @@ body {
     background-color: gray;
 }
 
-.moisture {
-    margin-bottom: 5px;
+.moisture-gauges {
+    display: flex;
+    justify-content: space-around;
+}
+
+.moisture-gauges canvas {
+    width: 150px;
+    height: 150px;
 }
