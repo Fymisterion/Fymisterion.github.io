@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const tempElement = document.getElementById('temp');
-    const humElement = document.getElementById('hum');
     const ledElements = [
         document.getElementById('led1'),
         document.getElementById('led2'),
@@ -54,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function fetchData() {
-        fetch('http://deine-esp32-ip-adresse/') // Hier die IP-Adresse deines ESP32 oder den DDNS-Domainnamen eintragen
+        fetch('http://192.168.1.50/') // Hier die IP-Adresse deines ESP32 oder den DDNS-Domainnamen eintragen
             .then(response => response.json())
             .then(data => {
                 updateGauge(tempGauge, data.temperature);
