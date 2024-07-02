@@ -10,8 +10,10 @@
     <div class="container">
         <div class="sensor">
             <h2>Aktuelle Werte</h2>
-            <p>Temperatur: <span id="temp"></span> °C</p>
-            <p>Luftfeuchtigkeit: <span id="hum"></span> %</p>
+            <div class="gauges">
+                <canvas id="tempGauge"></canvas>
+                <canvas id="humGauge"></canvas>
+            </div>
         </div>
 
         <div class="sensor">
@@ -45,6 +47,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script src="scripts.js"></script>
 </body>
 </html>
