@@ -9,19 +9,66 @@ document.addEventListener('DOMContentLoaded', function () {
     ];
     const intervalElement = document.getElementById('interval');
     const ctx = document.getElementById('chart').getContext('2d');
+    const tempCtx = document.getElementById('tempGauge').getContext('2d');
+    const humCtx = document.getElementById('humGauge').getContext('2d');
 
     let chart;
+    let tempGauge;
+    let humGauge;
+
+    function createGauge(ctx, label, color, maxValue) {
+        return new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: [label],
+                datasets: [{
+                    data: [0, maxValue],
+                    backgroundColor: [color, '#e0e0e0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                rotation: 1 * Math.PI,
+                circumference: 1 * Math.PI,
+                cutoutPercentage: 80,
+                plugins: {
+                    datalabels: {
+                        display: true,
+                        formatter: function (value, context) {
+                            return context.chart.data.datasets[0].data[0] + '%';
+                        },
+                        color: '#000',
+                        backgroundColor: '#fff',
+                        borderRadius: 3,
+                        font: {
+                            weight: 'bold',
+                            size: 16
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
 
     function fetchData() {
         fetch('http://deine-esp32-ip-adresse/') // Hier die IP-Adresse deines ESP32 oder den DDNS-Domainnamen eintragen
             .then(response => response.json())
             .then(data => {
-                tempElement.textContent = data.temperature;
-                humElement.textContent = data.humidity;
+                updateGauge(tempGauge, data.temperature);
+                updateGauge(humGauge, data.humidity);
                 updateLEDs(data.pumpStatus);
                 updateChart(data.history);
             })
             .catch(error => console.error('Error fetching data:', error));
+    }
+
+    function updateGauge(gauge, value) {
+        gauge.data.datasets[0].data[0] = value;
+        gauge.data.datasets[0].data[1] = gauge.data.datasets[0].data[1] - value;
+        gauge.update();
     }
 
     function updateLEDs(pumpStatus) {
@@ -115,6 +162,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     intervalElement.addEventListener('change', fetchData);
+
+    tempGauge = createGauge(tempCtx, 'Temperatur', 'red', 50);
+    humGauge = createGauge(humCtx, 'Luftfeuchtigkeit', 'blue', 100);
 
     setInterval(fetchData, 5000);
     fetchData();
