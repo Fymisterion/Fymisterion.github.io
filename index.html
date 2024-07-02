@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Datenanzeige</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sensor">
+            <h2>Aktuelle Werte</h2>
+            <p>Temperatur: <span id="temp"></span> °C</p>
+            <p>Luftfeuchtigkeit: <span id="hum"></span> %</p>
+        </div>
+
+        <div class="sensor">
+            <h2>Verlaufsdiagramm</h2>
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+            <label for="interval">Intervall wählen:</label>
+            <select id="interval">
+                <option value="1H">Letzte Stunde</option>
+                <option value="4H">Letzte 4 Stunden</option>
+                <option value="1D">Letzter Tag</option>
+                <option value="1W">Letzte Woche</option>
+            </select>
+        </div>
+
+        <div class="sensor">
+            <h2>Pumpen Status</h2>
+            <div>
+                Pumpe 1: <div class="led gray" id="led1"></div>
+                Pumpe 2: <div class="led gray" id="led2"></div>
+                Pumpe 3: <div class="led gray" id="led3"></div>
+                Pumpe 4: <div class="led gray" id="led4"></div>
+            </div>
+        </div>
+
+        <div class="sensor">
+            <h2>Livestream</h2>
+            <iframe src="http://esp32-cam.local:81/stream" width="640" height="480"></iframe>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>
