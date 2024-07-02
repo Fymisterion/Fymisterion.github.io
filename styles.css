@@ -25,7 +25,14 @@ body {
 
 .gauges {
     display: flex;
-    justify-content: space-between; /* Änderung von space-around zu space-between */
+    flex-direction: row; /* Zeile anstatt space-around */
+    justify-content: space-between;
+    align-items: center; /* Zentriert vertikal */
+}
+
+.gauges canvas {
+    width: 200px; /* Breite anpassen, je nach gewünschtem Layout */
+    height: 200px; /* Höhe anpassen, je nach gewünschtem Layout */
 }
 
 .chart-container {
