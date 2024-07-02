@@ -1,182 +1,148 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const ledElements = [
-        document.getElementById('led1'),
-        document.getElementById('led2'),
-        document.getElementById('led3'),
-        document.getElementById('led4')
-    ];
     const intervalElement = document.getElementById('interval');
     const ctx = document.getElementById('chart').getContext('2d');
-    const tempCtx = document.getElementById('tempGauge').getContext('2d');
-    const humCtx = document.getElementById('humGauge').getContext('2d');
-    const soilMoistureElements = [
-        document.getElementById('moisture1'),
-        document.getElementById('moisture2'),
-        document.getElementById('moisture3'),
-        document.getElementById('moisture4')
-    ];
+    const tempGauge = document.getElementById('tempGauge').getContext('2d');
+    const humGauge = document.getElementById('humGauge').getContext('2d');
+    const moistureGauge1 = document.getElementById('moistureGauge1').getContext('2d');
+    const moistureGauge2 = document.getElementById('moistureGauge2').getContext('2d');
+    const moistureGauge3 = document.getElementById('moistureGauge3').getContext('2d');
+    const moistureGauge4 = document.getElementById('moistureGauge4').getContext('2d');
 
-    let chart;
-    let tempGauge;
-    let humGauge;
-
-    function createGauge(ctx, label, color, maxValue) {
-        return new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: [label],
-                datasets: [{
-                    data: [0, maxValue],
-                    backgroundColor: [color, '#e0e0e0'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                rotation: 1 * Math.PI,
-                circumference: 1 * Math.PI,
-                cutoutPercentage: 80,
-                plugins: {
-                    datalabels: {
-                        display: true,
-                        formatter: function (value, context) {
-                            return context.chart.data.datasets[0].data[0] + '%';
-                        },
-                        color: '#000',
-                        backgroundColor: '#fff',
-                        borderRadius: 3,
-                        font: {
-                            weight: 'bold',
-                            size: 16
+    const tempChart = new Chart(tempGauge, {
+        type: 'doughnut',
+        data: {
+            labels: ['Temperatur'],
+            datasets: [{
+                data: [0, 100],
+                backgroundColor: ['#FF6384', '#E0E0E0'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            circumference: Math.PI,
+            rotation: Math.PI,
+            cutout: '70%',
+            plugins: {
+                datalabels: {
+                    display: true,
+                    align: 'center',
+                    anchor: 'center',
+                    formatter: (value, ctx) => {
+                        if (ctx.dataIndex === 0) {
+                            return value + '°C';
+                        } else {
+                            return '';
                         }
                     }
                 }
-            },
-            plugins: [ChartDataLabels]
-        });
-    }
+            }
+        }
+    });
 
-    function fetchData() {
-        fetch('http://192.168.1.50/') // Hier die IP-Adresse deines ESP32 oder den DDNS-Domainnamen eintragen
+    const humChart = new Chart(humGauge, {
+        type: 'doughnut',
+        data: {
+            labels: ['Luftfeuchtigkeit'],
+            datasets: [{
+                data: [0, 100],
+                backgroundColor: ['#36A2EB', '#E0E0E0'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            circumference: Math.PI,
+            rotation: Math.PI,
+            cutout: '70%',
+            plugins: {
+                datalabels: {
+                    display: true,
+                    align: 'center',
+                    anchor: 'center',
+                    formatter: (value, ctx) => {
+                        if (ctx.dataIndex === 0) {
+                            return value + '%';
+                        } else {
+                            return '';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    const moistureCharts = [moistureGauge1, moistureGauge2, moistureGauge3, moistureGauge4].map((ctx, index) => new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: [`Feuchtigkeit ${index + 1}`],
+            datasets: [{
+                data: [0, 100],
+                backgroundColor: ['#4BC0C0', '#E0E0E0'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            circumference: Math.PI,
+            rotation: Math.PI,
+            cutout: '70%',
+            plugins: {
+                datalabels: {
+                    display: true,
+                    align: 'center',
+                    anchor: 'center',
+                    formatter: (value, ctx) => {
+                        if (ctx.dataIndex === 0) {
+                            return value + '%';
+                        } else {
+                            return '';
+                        }
+                    }
+                }
+            }
+        }
+    }));
+
+    const fetchData = () => {
+        fetch('http://192.168.1.50/')  // IP-Adresse des ESP32-Webservers
             .then(response => response.json())
             .then(data => {
-                updateGauge(tempGauge, data.temperature);
-                updateGauge(humGauge, data.humidity);
-                updateLEDs(data.pumpStatus);
-                updateMoisture(data.soilMoisture);
-                updateChart(data.history);
+                const { temperature, humidity, soilMoisture, pumpStatus } = data;
+
+                // Update temp and humidity gauges
+                tempChart.data.datasets[0].data[0] = temperature;
+                tempChart.data.datasets[0].data[1] = 100 - temperature;
+                tempChart.update();
+
+                humChart.data.datasets[0].data[0] = humidity;
+                humChart.data.datasets[0].data[1] = 100 - humidity;
+                humChart.update();
+
+                // Update soil moisture gauges
+                soilMoisture.forEach((value, index) => {
+                    moistureCharts[index].data.datasets[0].data[0] = value;
+                    moistureCharts[index].data.datasets[0].data[1] = 100 - value;
+                    moistureCharts[index].update();
+                });
+
+                // Update pump status LEDs
+                pumpStatus.forEach((status, index) => {
+                    const led = document.getElementById(`led${index + 1}`);
+                    if (status) {
+                        led.classList.remove('gray');
+                        led.classList.add('green');
+                    } else {
+                        led.classList.remove('green');
+                        led.classList.add('gray');
+                    }
+                });
             })
             .catch(error => console.error('Error fetching data:', error));
-    }
-
-    function updateGauge(gauge, value) {
-        gauge.data.datasets[0].data[0] = value;
-        gauge.data.datasets[0].data[1] = gauge.data.datasets[0].data[1] - value;
-        gauge.update();
-    }
-
-    function updateLEDs(pumpStatus) {
-        pumpStatus.forEach((status, index) => {
-            if (status === 1) {
-                ledElements[index].classList.remove('gray');
-                ledElements[index].classList.add('green');
-            } else {
-                ledElements[index].classList.remove('green');
-                ledElements[index].classList.add('gray');
-            }
-        });
-    }
-
-    function updateMoisture(moistureData) {
-        moistureData.forEach((moisture, index) => {
-            soilMoistureElements[index].textContent = `Bodenfeuchte: ${moisture}%`;
-        });
-    }
-
-    function updateChart(historyData) {
-        const interval = intervalElement.value;
-        const filteredData = filterHistoryData(historyData, interval);
-
-        if (chart) {
-            chart.destroy();
-        }
-
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: filteredData.labels,
-                datasets: [{
-                    label: 'Temperatur',
-                    data: filteredData.temperature,
-                    borderColor: 'blue',
-                    fill: false
-                }, {
-                    label: 'Luftfeuchtigkeit',
-                    data: filteredData.humidity,
-                    borderColor: 'green',
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'hour'
-                        }
-                    },
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-
-    function filterHistoryData(historyData, interval) {
-        const now = new Date();
-        let filteredData = {
-            labels: [],
-            temperature: [],
-            humidity: []
-        };
-
-        historyData.forEach(entry => {
-            const entryDate = new Date(entry.timestamp);
-            if (isWithinInterval(entryDate, now, interval)) {
-                filteredData.labels.push(entryDate);
-                filteredData.temperature.push(entry.temperature);
-                filteredData.humidity.push(entry.humidity);
-            }
-        });
-
-        return filteredData;
-    }
-
-    function isWithinInterval(date, now, interval) {
-        const diff = now - date;
-        switch (interval) {
-            case '1H':
-                return diff <= 3600000;
-            case '4H':
-                return diff <= 14400000;
-            case '1D':
-                return diff <= 86400000;
-            case '1W':
-                return diff <= 604800000;
-            default:
-                return false;
-        }
-    }
-
-    intervalElement.addEventListener('change', fetchData);
-
-    tempGauge = createGauge(tempCtx, 'Temperatur', 'red', 50);
-    humGauge = createGauge(humCtx, 'Luftfeuchtigkeit', 'blue', 100);
+    };
 
     setInterval(fetchData, 5000);
     fetchData();
+
+    intervalElement.addEventListener('change', () => {
+        const interval = intervalElement.value;
+        // Implement your logic to fetch and update chart data based on the selected interval
+    });
 });
