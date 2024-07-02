@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Datenanzeige</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .sensor {
+            margin-bottom: 20px;
+        }
+        .sensor h2 {
+            margin-bottom: 10px;
+        }
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        .led {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .led.green {
+            background-color: green;
+        }
+        .led.gray {
+            background-color: gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sensor">
+            <h2>Aktuelle Werte</h2>
+            <p>Temperatur: <span id="temp"></span> °C</p>
+            <p>Luftfeuchtigkeit: <span id="hum"></span> %</p>
+        </div>
+
+        <div class="sensor">
+            <h2>Verlaufsdiagramm</h2>
+            <div class="chart-container" id="chart"></div>
+            <label for="interval">Intervall wählen:</label>
+            <select id="interval">
+                <option value="1H">Letzte Stunde</option>
+                <option value="4H">Letzte 4 Stunden</option>
+                <option value="1D">Letzter Tag</option>
+                <option value="1W">Letzte Woche</option>
+            </select>
+        </div>
+
+        <div class="sensor">
+            <h2>Pumpen Status</h2>
+            <div>
+                Pumpe 1: <div class="led" id="led1"></div>
+                Pumpe 2: <div class="led" id="led2"></div>
+                Pumpe 3: <div class="led" id="led3"></div>
+                Pumpe 4: <div class="led" id="led4"></div>
+            </div>
+        </div>
+
+        <div class="sensor">
+            <h2>Livestream</h2>
+            <iframe src="http://esp32-cam.local:81/stream" width="640" height="480"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Funktion zum Laden der aktuellen Daten
+        function loadData() {
+            fetch('http://deine-esp32-ip-adresse/') // Hier die IP-Adresse deines ESP32 oder den DDNS-Domainnamen eintragen
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('temp').textContent = data.temperature;
+                    document.getElementById('hum').textContent = data.humidity;
+                    updateLEDs(data.pumpStatus); // Annahme: pumpStatus ist ein Array mit 4 Elementen (0 oder 1)
+                    drawChart(data.history); // Annahme: history enthält die Verlaufsdaten
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Funktion zum Aktualisieren der LEDs basierend auf dem Pumpenstatus
+        function updateLEDs(pumpStatus) {
+            for (let i = 0; i < 4; i++) {
+                if (pumpStatus[i] === 1) {
+                    document.getElementById('led' + (i + 1)).classList.remove('gray');
+                    document.getElementById('led' + (i + 1)).classList.add('green');
+                } else {
+                    document.getElementById('led' + (i + 1)).classList.remove('green');
+                    document.getElementById('led' + (i + 1)).classList.add('gray');
+                }
+            }
+        }
+
+        // Funktion zum Zeichnen des Verlaufsdiagramms
+        function drawChart(historyData) {
+            // Hier musst du den Code für das Diagramm je nach verwendeter Bibliothek einfügen (z.B. Chart.js, Google Charts, etc.)
+            // Beispiel für Chart.js:
+            const ctx = document.getElementById('chart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: historyData.labels,
+                    datasets: [{
+                        label: 'Temperatur',
+                        data: historyData.temperature,
+                        borderColor: 'blue',
+                        fill: false
+                    }, {
+                        label: 'Luftfeuchtigkeit',
+                        data: historyData.humidity,
+                        borderColor: 'green',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'hour'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Aktualisieren der Daten alle 5 Sekunden
+        setInterval(loadData, 5000);
+
+        // Initiales Laden der Daten
+        loadData();
+    </script>
+</body>
+</html>
