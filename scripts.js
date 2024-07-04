@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    const webSocket = new WebSocket('wss://192.168.1.184:81');
+    const webSocket = new WebSocket('wss://192.168.1.50:81');
 
     webSocket.onopen = function () {
         console.log('WebSocket connection established');
