@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
   setInterval(getData, 5000); // Alle 5 Sekunden aktualisieren
 
   function getData() {
-    fetch("http://192.168.1.50/") // IP des ESP32 hier eintragen
+    fetch("http://192.168.1.50/data") // Stelle sicher, dass die URL zum ESP32 und der Endpunkt korrekt sind
       .then(response => response.json())
       .then(data => {
         document.getElementById('tempValue').innerText = data.temperature.toFixed(1) + " °C";
