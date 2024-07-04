@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
     const intervalElement = document.getElementById('interval');
-    const ctx = document.getElementById('chart').getContext('2d');
-    const tempGaugeCtx = document.getElementById('tempGauge').getContext('2d');
-    const humGaugeCtx = document.getElementById('humGauge').getContext('2d');
-    const moistureGaugeCtx1 = document.getElementById('moistureGauge1').getContext('2d');
-    const moistureGaugeCtx2 = document.getElementById('moistureGauge2').getContext('2d');
-    const moistureGaugeCtx3 = document.getElementById('moistureGauge3').getContext('2d');
-    const moistureGaugeCtx4 = document.getElementById('moistureGauge4').getContext('2d');
+    const tempElement = document.getElementById('tempValue');
+    const humElement = document.getElementById('humValue');
+    const moistureElements = [
+        document.getElementById('moistureValue1'),
+        document.getElementById('moistureValue2'),
+        document.getElementById('moistureValue3'),
+        document.getElementById('moistureValue4')
+    ];
 
     const ledElements = [
         document.getElementById('led1'),
@@ -15,89 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('led4')
     ];
 
-    const tempGauge = new Chart(tempGaugeCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Temperature'],
-            datasets: [{
-                data: [0, 100],
-                backgroundColor: ['#FF6384', '#EEEEEE'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            circumference: Math.PI,
-            rotation: Math.PI,
-            cutoutPercentage: 60,
-            plugins: {
-                datalabels: {
-                    display: true,
-                    align: 'center',
-                    anchor: 'center',
-                    formatter: (value, ctx) => ctx.chart.data.datasets[0].data[0] + '°C',
-                }
-            }
-        }
-    });
-
-    const humGauge = new Chart(humGaugeCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Humidity'],
-            datasets: [{
-                data: [0, 100],
-                backgroundColor: ['#36A2EB', '#EEEEEE'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            circumference: Math.PI,
-            rotation: Math.PI,
-            cutoutPercentage: 60,
-            plugins: {
-                datalabels: {
-                    display: true,
-                    align: 'center',
-                    anchor: 'center',
-                    formatter: (value, ctx) => ctx.chart.data.datasets[0].data[0] + '%',
-                }
-            }
-        }
-    });
-
-    const moistureGauges = [
-        new Chart(moistureGaugeCtx1, createMoistureGaugeConfig()),
-        new Chart(moistureGaugeCtx2, createMoistureGaugeConfig()),
-        new Chart(moistureGaugeCtx3, createMoistureGaugeConfig()),
-        new Chart(moistureGaugeCtx4, createMoistureGaugeConfig())
-    ];
-
-    function createMoistureGaugeConfig() {
-        return {
-            type: 'doughnut',
-            data: {
-                labels: ['Soil Moisture'],
-                datasets: [{
-                    data: [0, 100],
-                    backgroundColor: ['#4CAF50', '#EEEEEE'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                circumference: Math.PI,
-                rotation: Math.PI,
-                cutoutPercentage: 60,
-                plugins: {
-                    datalabels: {
-                        display: true,
-                        align: 'center',
-                        anchor: 'center',
-                        formatter: (value, ctx) => ctx.chart.data.datasets[0].data[0] + '%',
-                    }
-                }
-            }
-        };
-    }
+    const ctx = document.getElementById('chart').getContext('2d');
 
     const chart = new Chart(ctx, {
         type: 'line',
@@ -169,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
             parseInt(xmlDoc.getElementsByTagName('pumpStatus4')[0].textContent)
         ];
 
-        updateGauges({temperature: temp, humidity: hum, soilMoisture, pumpStatus});
+        updateValues({temperature: temp, humidity: hum, soilMoisture, pumpStatus});
         updateChart({temperature: temp, humidity: hum});
         updateLedStatus({pumpStatus});
     };
@@ -178,19 +97,12 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('WebSocket connection closed');
     };
 
-    function updateGauges(data) {
-        tempGauge.data.datasets[0].data[0] = data.temperature;
-        tempGauge.data.datasets[0].data[1] = 100 - data.temperature;
-        tempGauge.update();
-
-        humGauge.data.datasets[0].data[0] = data.humidity;
-        humGauge.data.datasets[0].data[1] = 100 - data.humidity;
-        humGauge.update();
+    function updateValues(data) {
+        tempElement.textContent = `${data.temperature.toFixed(1)} °C`;
+        humElement.textContent = `${data.humidity.toFixed(1)} %`;
 
         for (let i = 0; i < 4; i++) {
-            moistureGauges[i].data.datasets[0].data[0] = data.soilMoisture[i];
-            moistureGauges[i].data.datasets[0].data[1] = 100 - data.soilMoisture[i];
-            moistureGauges[i].update();
+            moistureElements[i].textContent = `${data.soilMoisture[i]} %`;
         }
     }
 
