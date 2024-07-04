@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    const webSocket = new WebSocket('ws://192.168.1.50:81');
+    const webSocket = new WebSocket('wss://192.168.1.50:81');
 
     webSocket.onopen = function () {
         console.log('WebSocket connection established');
@@ -71,28 +71,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     webSocket.onmessage = function (event) {
         const data = JSON.parse(event.data);
-        updateValues(data);
-        updateChart(data);
-        updateLedStatus(data);
-    };
 
-    webSocket.onclose = function () {
-        console.log('WebSocket connection closed');
-    };
+        tempElement.textContent = data.temperature.toFixed(1) + ' °C';
+        humElement.textContent = data.humidity.toFixed(1) + ' %';
 
-    function updateValues(data) {
-        tempElement.textContent = `${data.temperature.toFixed(1)} °C`;
-        humElement.textContent = `${data.humidity.toFixed(1)} %`;
+        data.soilMoisture.forEach((value, index) => {
+            moistureElements[index].textContent = value + ' %';
+        });
 
-        for (let i = 0; i < 4; i++) {
-            moistureElements[i].textContent = `${data.soilMoisture[i]} %`;
-        }
-    }
+        data.pumpStatus.forEach((status, index) => {
+            ledElements[index].className = status ? 'led green' : 'led gray';
+        });
 
-    function updateChart(data) {
-        const currentTime = new Date().toLocaleTimeString();
-
-        chart.data.labels.push(currentTime);
+        const currentTime = new Date();
+        chart.data.labels.push(currentTime.toLocaleTimeString());
         chart.data.datasets[0].data.push(data.temperature);
         chart.data.datasets[1].data.push(data.humidity);
 
@@ -103,11 +95,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         chart.update();
-    }
+    };
 
-    function updateLedStatus(data) {
-        for (let i = 0; i < 4; i++) {
-            ledElements[i].className = data.pumpStatus[i] ? 'led green' : 'led gray';
-        }
-    }
+    intervalElement.addEventListener('change', function () {
+        // Handle interval change if necessary
+    });
 });
