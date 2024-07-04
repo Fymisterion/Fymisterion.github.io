@@ -101,3 +101,21 @@ document.addEventListener('DOMContentLoaded', function () {
         // Handle interval change if necessary
     });
 });
+const webSocket = new WebSocket('wss://192.168.1.50:81');
+
+webSocket.onopen = function () {
+    console.log('WebSocket connection established');
+};
+
+webSocket.onerror = function (error) {
+    console.error('WebSocket error:', error);
+};
+
+webSocket.onclose = function () {
+    console.log('WebSocket connection closed');
+};
+
+webSocket.onmessage = function (event) {
+    console.log('WebSocket message received:', event.data);
+    // Weitere Verarbeitung der empfangenen Daten hier
+};
