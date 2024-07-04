@@ -70,27 +70,10 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     webSocket.onmessage = function (event) {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(event.data, "text/xml");
-
-        const temp = parseFloat(xmlDoc.getElementsByTagName('temperature')[0].textContent);
-        const hum = parseFloat(xmlDoc.getElementsByTagName('humidity')[0].textContent);
-        const soilMoisture = [
-            parseInt(xmlDoc.getElementsByTagName('soilMoisture1')[0].textContent),
-            parseInt(xmlDoc.getElementsByTagName('soilMoisture2')[0].textContent),
-            parseInt(xmlDoc.getElementsByTagName('soilMoisture3')[0].textContent),
-            parseInt(xmlDoc.getElementsByTagName('soilMoisture4')[0].textContent)
-        ];
-        const pumpStatus = [
-            parseInt(xmlDoc.getElementsByTagName('pumpStatus1')[0].textContent),
-            parseInt(xmlDoc.getElementsByTagName('pumpStatus2')[0].textContent),
-            parseInt(xmlDoc.getElementsByTagName('pumpStatus3')[0].textContent),
-            parseInt(xmlDoc.getElementsByTagName('pumpStatus4')[0].textContent)
-        ];
-
-        updateValues({temperature: temp, humidity: hum, soilMoisture, pumpStatus});
-        updateChart({temperature: temp, humidity: hum});
-        updateLedStatus({pumpStatus});
+        const data = JSON.parse(event.data);
+        updateValues(data);
+        updateChart(data);
+        updateLedStatus(data);
     };
 
     webSocket.onclose = function () {
