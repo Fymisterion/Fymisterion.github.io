@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
   setInterval(getData, 5000); // Alle 5 Sekunden aktualisieren
 
   function getData() {
-    fetch("http://IP_DES_ESP32/") // IP des ESP32 hier eintragen
+    fetch("192.168.1.50") // IP des ESP32 hier eintragen
       .then(response => response.text())
       .then(data => {
         let parser = new DOMParser();
