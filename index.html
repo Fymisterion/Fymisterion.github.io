@@ -1,28 +1,60 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>ESP IOT DASHBOARD</title>
+        <title>Growzelt</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" type="image/png" href="favicon.png">
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
         <div class="topnav">
-            <h1>SENSOR READINGS (WEBSOCKET)</h1>
+            <h1>Growzelt</h1>
         </div>
         <div class="content">
-            <div class="card-grid">
+            <div class="sensor-grid">
                 <div class="card">
-                    <p class="card-title"><i class="fas fa-thermometer-threequarters" style="color:#059e8a;"></i> Temperature</p>
+                    <p class="card-title"><i class="fas fa-thermometer-threequarters" style="color:#059e8a;"></i> Temperatur</p>
                     <p class="reading"><span id="temperature"></span> &deg;C</p>
                 </div>
                 <div class="card">
-                    <p class="card-title"> Humidity</p>
+                    <p class="card-title">Luftfeuchtigkeit</p>
                     <p class="reading"><span id="humidity"></span> &percnt;</p>
                 </div>
+            </div>
+            <div class="sensor-grid">
                 <div class="card">
-                    <p class="card-title"> Pressure</p>
-                    <p class="reading"><span id="pressure"></span> hpa</p>
+                    <p class="card-title">Bodenfeuchtigkeit 1</p>
+                    <p class="reading"><span id="soilMoisture1"></span> &percnt;</p>
+                </div>
+                <div class="card">
+                    <p class="card-title">Bodenfeuchtigkeit 2</p>
+                    <p class="reading"><span id="soilMoisture2"></span> &percnt;</p>
+                </div>
+                <div class="card">
+                    <p class="card-title">Bodenfeuchtigkeit 3</p>
+                    <p class="reading"><span id="soilMoisture3"></span> &percnt;</p>
+                </div>
+                <div class="card">
+                    <p class="card-title">Bodenfeuchtigkeit 4</p>
+                    <p class="reading"><span id="soilMoisture4"></span> &percnt;</p>
+                </div>
+            </div>
+            <div class="sensor-grid">
+                <div class="card">
+                    <p class="card-title">Pumpe 1 Status</p>
+                    <p class="reading"><span id="pump1Status"></span></p>
+                </div>
+                <div class="card">
+                    <p class="card-title">Pumpe 2 Status</p>
+                    <p class="reading"><span id="pump2Status"></span></p>
+                </div>
+                <div class="card">
+                    <p class="card-title">Pumpe 3 Status</p>
+                    <p class="reading"><span id="pump3Status"></span></p>
+                </div>
+                <div class="card">
+                    <p class="card-title">Pumpe 4 Status</p>
+                    <p class="reading"><span id="pump4Status"></span></p>
                 </div>
             </div>
         </div>
