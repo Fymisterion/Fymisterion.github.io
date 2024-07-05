@@ -1,4 +1,4 @@
-var gateway = `ws://<ESP32-IP-Adresse>/ws`;
+var gateway = `ws://192.168.7.202/ws`;
 var websocket;
 // Init web socket when the page loads
 window.addEventListener('load', onload);
