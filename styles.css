@@ -39,6 +39,18 @@ body {
     margin-bottom: 20px;
 }
 
+.moisture-gauges {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.moisture-gauges canvas {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+}
+
 .led {
     display: inline-block;
     width: 20px;
@@ -53,14 +65,4 @@ body {
 
 .led.gray {
     background-color: gray;
-}
-
-.moisture-gauges {
-    display: flex;
-    justify-content: space-around;
-}
-
-.moisture-gauges canvas {
-    width: 150px;
-    height: 150px;
 }
