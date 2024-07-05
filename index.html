@@ -1,61 +1,63 @@
-<!DOCTYPE HTML><html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-  <style>
-    html {
-     font-family: Arial;
-     display: inline-block;
-     margin: 0px auto;
-     text-align: center;
-    }
-    h2 { font-size: 3.0rem; }
-    p { font-size: 3.0rem; }
-    .units { font-size: 1.2rem; }
-    .dht-labels{
-      font-size: 1.5rem;
-      vertical-align:middle;
-      padding-bottom: 15px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Datenanzeige</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h2>ESP32 DHT Server</h2>
-  <p>
-    <i class="fas fa-thermometer-half" style="color:#059e8a;"></i> 
-    <span class="dht-labels">Temperature</span> 
-    <span id="temperature">36</span>
-    <sup class="units">&deg;C</sup>
-  </p>
-  <p>
-    <i class="fas fa-tint" style="color:#00add6;"></i> 
-    <span class="dht-labels">Humidity</span>
-    <span id="humidity">61%</span>
-    <sup class="units">%</sup>
-  </p>
-</body>
-<!--<script>
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("temperature").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/temperature", true);
-  xhttp.send();
-}, 10000 ) ;
+    <div class="container">
+        <div class="sensor">
+            <h2>Aktuelle Werte</h2>
+            <div class="gauges">
+                <canvas id="tempGauge"></canvas>
+                <canvas id="humGauge"></canvas>
+            </div>
+        </div>
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("humidity").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/humidity", true);
-  xhttp.send();
-}, 10000 ) ;
-</script>
-!-->
-</html>)
+        <div class="sensor">
+            <h2>Verlaufsdiagramm</h2>
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+            <label for="interval">Intervall wählen:</label>
+            <select id="interval">
+                <option value="1H">Letzte Stunde</option>
+                <option value="4H">Letzte 4 Stunden</option>
+                <option value="1D">Letzter Tag</option>
+                <option value="1W">Letzte Woche</option>
+            </select>
+        </div>
+
+        <div class="sensor">
+            <h2>Pumpen Status</h2>
+            <div>
+                Pumpe 1: <div class="led gray" id="led1"></div>
+                Pumpe 2: <div class="led gray" id="led2"></div>
+                Pumpe 3: <div class="led gray" id="led3"></div>
+                Pumpe 4: <div class="led gray" id="led4"></div>
+            </div>
+        </div>
+
+        <div class="sensor">
+            <h2>Bodenfeuchtigkeit</h2>
+            <div class="moisture-gauges">
+                <canvas id="moistureGauge1"></canvas>
+                <canvas id="moistureGauge2"></canvas>
+                <canvas id="moistureGauge3"></canvas>
+                <canvas id="moistureGauge4"></canvas>
+            </div>
+        </div>
+
+        <div class="sensor">
+            <h2>Livestream</h2>
+            <iframe src="http://esp32-cam.local:81/stream" width="640" height="480"></iframe>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>
