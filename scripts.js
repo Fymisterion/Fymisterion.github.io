@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const intervalElement = document.getElementById('interval');
-    const ctx = document.getElementById('chart').getContext('2d');
     const tempGaugeCtx = document.getElementById('tempGauge').getContext('2d');
     const humGaugeCtx = document.getElementById('humGauge').getContext('2d');
     const moistureGaugeCtx1 = document.getElementById('moistureGauge1').getContext('2d');
@@ -101,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    const chart = new Chart(ctx, {
+    const chart = new Chart(document.getElementById('chart').getContext('2d'), {
         type: 'line',
         data: {
             labels: [],
@@ -146,32 +144,27 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function fetchData() {
-        fetch('http://192.168.1.50')
-            .then(response => response.text())
-            .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
-            .then(data => {
-                const temp = parseFloat(data.getElementsByTagName('temperature')[0].textContent);
-                const hum = parseFloat(data.getElementsByTagName('humidity')[0].textContent);
-                const soilMoisture = [
-                    parseInt(data.getElementsByTagName('soilMoisture1')[0].textContent),
-                    parseInt(data.getElementsByTagName('soilMoisture2')[0].textContent),
-                    parseInt(data.getElementsByTagName('soilMoisture3')[0].textContent),
-                    parseInt(data.getElementsByTagName('soilMoisture4')[0].textContent)
-                ];
-                const pumpStatus = [
-                    parseInt(data.getElementsByTagName('pumpStatus1')[0].textContent),
-                    parseInt(data.getElementsByTagName('pumpStatus2')[0].textContent),
-                    parseInt(data.getElementsByTagName('pumpStatus3')[0].textContent),
-                    parseInt(data.getElementsByTagName('pumpStatus4')[0].textContent)
-                ];
+    let socket = new WebSocket('ws://192.168.1.50:81/');
 
-                updateGauges({temperature: temp, humidity: hum, soilMoisture, pumpStatus});
-                updateChart({temperature: temp, humidity: hum});
-                updateLedStatus({pumpStatus});
-            })
-            .catch(error => console.error('Error fetching data:', error));
-    }
+    socket.onopen = function(event) {
+        console.log('WebSocket is connected.');
+        socket.send('getStatus');
+    };
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        updateGauges(data);
+        updateChart(data);
+        updateLedStatus(data);
+    };
+
+    socket.onerror = function(error) {
+        console.log('WebSocket Error: ' + error);
+    };
+
+    socket.onclose = function(event) {
+        console.log('WebSocket connection closed.');
+    };
 
     function updateGauges(data) {
         tempGauge.data.datasets[0].data[0] = data.temperature;
@@ -183,8 +176,8 @@ document.addEventListener('DOMContentLoaded', function () {
         humGauge.update();
 
         for (let i = 0; i < 4; i++) {
-            moistureGauges[i].data.datasets[0].data[0] = data.soilMoisture[i];
-            moistureGauges[i].data.datasets[0].data[1] = 100 - data.soilMoisture[i];
+            moistureGauges[i].data.datasets[0].data[0] = data['soilMoisture' + (i + 1)];
+            moistureGauges[i].data.datasets[0].data[1] = 100 - data['soilMoisture' + (i + 1)];
             moistureGauges[i].update();
         }
     }
@@ -207,10 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateLedStatus(data) {
         for (let i = 0; i < 4; i++) {
-            ledElements[i].className = data.pumpStatus[i] ? 'led green' : 'led gray';
+            ledElements[i].className = data['pumpStatus' + (i + 1)] ? 'led green' : 'led gray';
         }
     }
-
-    setInterval(fetchData, updateInterval);
-    fetchData(); // Initial fetch
 });
